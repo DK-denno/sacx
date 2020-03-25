@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttersacco/AuthLogic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -11,10 +11,12 @@ import 'formControllers.dart';
 import 'package:wc_form_validators/wc_form_validators.dart';
 import 'loader.dart';
 import 'loader.dart';
+import "profile.dart";
+import "loansPage.dart";
 
 
 void main()=>runApp(MaterialApp(
-  home:login(),
+  home:mainpage(),
   theme: new ThemeData(
     primarySwatch: Colors.blue,
   ),
@@ -474,16 +476,96 @@ class _mainpageState extends State<mainpage> {
     }
 
   }
+
+Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
+    return Material(
+      color: Colors.white,
+      elevation: 14.0,
+      shadowColor: Color(0x802196F3),
+      borderRadius: BorderRadius.circular(24.0),
+        child: InkWell(
+          onTap: (){
+
+            Navigator.of(context).push(
+                new MaterialPageRoute(builder:
+                    (BuildContext context) => tile));
+          },
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(title,
+                          style: TextStyle(
+                            color: color,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ),
+                      //icon
+                      Material(
+                        color:color,
+                        borderRadius: BorderRadius.circular(24.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Icon(
+                            icon,
+                            color: Colors.white,
+                            size: 30.0,
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+    );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        elevation: 1.0,
-        title: Text("MAIN PAGE"),
+        title:Text("Home",
+          style: TextStyle(
+            fontSize: 25.0
+          ),
+        )
       ),
-      body: Stack(
+      body:StaggeredGridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12.0,
+          mainAxisSpacing: 12.0,
+          padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 8.0),
+          children: <Widget>[
+            Profile(),
+            myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage()),
+            myTiles(Icons.account_balance,"Deposit",Colors.green,signUp()),
+            myTiles(Icons.account_balance,"Loan Report",Colors.blue,signUp()),
+            myTiles(Icons.account_balance,"Loan Report",Colors.orange,signUp()),
 
+          ],
+        staggeredTiles: [
+          StaggeredTile.extent(2, 350.0),
+          StaggeredTile.extent(1, 130.0),
+          StaggeredTile.extent(1, 130.0),
+          StaggeredTile.extent(1, 130.0),
+          StaggeredTile.extent(1, 130.0),
+
+
+        ],
       ),
     );
   }
