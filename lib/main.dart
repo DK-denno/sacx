@@ -195,11 +195,13 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
       String res = await AuthLogic.signin(username,pass);
 //      print(res);
       if (res=="success"){
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
             new MaterialPageRoute(builder:
                 (BuildContext context) => mainpage()));
       }else if(res=="failed"){
-        Future.delayed(const Duration(milliseconds: 800), () {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          Navigator.of(context).pop();
           Navigator.of(context).pushReplacement(
               new MaterialPageRoute(builder:
                   (BuildContext context) => login()));
