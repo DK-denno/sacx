@@ -37,6 +37,7 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
   Animation<double> _iconAnimation;
 
   bool _isloading = false;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -81,6 +82,7 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
                 ),
               ),
               Form(
+                key: _formKey,
                 child: Theme(
                   data: ThemeData(
                     brightness: Brightness.dark,
@@ -104,6 +106,7 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
 
                           ),
                           keyboardType: TextInputType.text,
+                          validator: Validators.required("Username is required"),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0),
@@ -113,6 +116,7 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
                           decoration: InputDecoration(
                             labelText: 'Enter Password',
                           ),
+                          validator: Validators.required("Password is required"),
                           keyboardType: TextInputType.text,
                           obscureText: true,
                         ),
@@ -133,7 +137,10 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
                             setState(() {
                               _isloading = true;
                             }),
-                            handleLoginSubmit(context,usernameconroller.text,passwordcontroller.text)
+                          if (_formKey.currentState.validate()) {
+                            handleLoginSubmit(context, usernameconroller.text,
+                                passwordcontroller.text)
+                          }
                           },
                           splashColor: Colors.redAccent,
                         )
@@ -165,7 +172,9 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
                       ),
                       InkWell(
                           onTap: () {
-                            Navigator.pushReplacement(context, signUp());
+                            Navigator.of(context).pushReplacement(
+                                new MaterialPageRoute(builder:
+                                    (BuildContext context) => signUp()));
 
                           },
                           child: Center(
@@ -220,8 +229,13 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
   TextEditingController passwordcontroller = new TextEditingController();
 }
 
-class signUp extends MaterialPageRoute<Null> {
 
+class signUp extends StatefulWidget {
+  @override
+  _signUpState createState() => _signUpState();
+}
+
+class _signUpState extends State<signUp> {
 
   SharedPreferences sharedpreferences;
 
@@ -231,9 +245,9 @@ class signUp extends MaterialPageRoute<Null> {
       //Royte back to this page
     }
   }
-
-
-  signUp() :super(builder: (BuildContext context) {
+  final _formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       resizeToAvoidBottomInset: false,
@@ -264,7 +278,7 @@ class signUp extends MaterialPageRoute<Null> {
                     ),
                   ),
                   Form(
-                    key: GlobalKey<FormState>(),
+                    key: _formKey,
                     child: Theme(
                       data: ThemeData(
                         brightness: Brightness.dark,
@@ -360,6 +374,7 @@ class signUp extends MaterialPageRoute<Null> {
                               {
 
                                 print("Works to here"),
+                              if (_formKey.currentState.validate()) {
                                 _handleSubmit(
                                     context,
                                     formControllers.usernameconroller.text,
@@ -368,7 +383,7 @@ class signUp extends MaterialPageRoute<Null> {
                                     formControllers.firstnamecontroller.text,
                                     formControllers.lastnamecontroller.text
                                 ),
-
+                              }
 
                               },
                               splashColor: Colors.redAccent,
@@ -411,9 +426,7 @@ class signUp extends MaterialPageRoute<Null> {
         ),
       ),
     );
-  });
-
-
+  }
   static Future<void> _handleSubmit(BuildContext context,username,email,pass,first,last) async {
 
     final GlobalKey<State> _keyLoader = new GlobalKey<State>();
@@ -423,19 +436,28 @@ class signUp extends MaterialPageRoute<Null> {
       String res = await AuthLogic.signup(username,email,pass,first,last);
       print("Response"+res);
       if (res=="success"){
-        Navigator.of(context).dispose();
+        Navigator.of(context).pop();
         Navigator.of(context).push(
             new MaterialPageRoute(builder:
                 (BuildContext context) => mainpage()));
-      }else{
+      }else if(res!="success"){
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacement(
+              new MaterialPageRoute(builder:
+                  (BuildContext context) => signUp()));
+        });
+        print("=======================res coming up===============================");
+        print(res);
         Dialogs.showErrorDialog(context,res);
 
+        print("===============================================================================");
+        print(res);
       }
     } catch (error) {
       print(error);
     }
   }
-
 }
 
 class mainpage extends StatefulWidget {

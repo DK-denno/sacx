@@ -46,18 +46,25 @@ class AuthLogic {
           "last_name":last_name});
     print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     jsonData = json.decode(response.body);
-    print(jsonData['username']);
+    print(jsonData['username'][0]);
     print("\n\n\n\n\n\n\n\n\n");
-   if (jsonData['username']==username && jsonData['first_name']==first_name) {
-      jsonData = json.decode(response.body);
-      print(response.body+"\n dk");
-      sharedpreferences.setString("username", jsonData['username']);
-      sharedpreferences.setString("password", jsonData['password']);
-      print("done");
-      return "success";
-    } else {
-      print(jsonData);
-      return jsonData;
+    try {
+      if (jsonData['username'] == username &&
+          jsonData['first_name'] == first_name) {
+        jsonData = json.decode(response.body);
+        print(response.body + "\n dk");
+        sharedpreferences.setString("username", jsonData['username']);
+        sharedpreferences.setString("password", jsonData['password']);
+        print("done");
+        return "success";
+      } else {
+        print(jsonData);
+        return jsonData['username'][0];
+      }
+    }catch(error){
+      print("error");
+      print(error);
+      return jsonData['username'][0];
     }
   }
 }
