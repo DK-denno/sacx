@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-Material Profile(){
+Material Profile(user,balance){
   return Material(
     color: Colors.white,
     elevation: 40.0,
@@ -11,18 +11,26 @@ Material Profile(){
           children: <Widget>[
             Center(
               child: CircleAvatar(
-                backgroundImage: AssetImage("assets/login.jpeg"),
+                backgroundImage: NetworkImage((() {
+                  if(user!=null){
+                    if(user['profile']['idPhoto']!=null){
+                      return "${user['profile']['idPhoto']}";
+                    }
+                    return "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEyza1-CKEJK6Hyq50yE8oOpyba5HbJaCqMioudHzaxVh-a9Is";
+                  }
+                  return "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEyza1-CKEJK6Hyq50yE8oOpyba5HbJaCqMioudHzaxVh-a9Is";
+                })()),
                 radius: 50.0,
               ),
             ),
             Divider(height: 30.0),
-            profDetails(),
+            profDetails(user,balance),
           ],
         ),
     );
 }
 
-profDetails(){
+profDetails(user,balance){
   return Column(
     children: <Widget>[
       Row(
@@ -32,12 +40,12 @@ profDetails(){
             Icons.person,
             color: Colors.black,
           ),
-          Text(
-            " emailHolder@gmail.com",
-            style: TextStyle(
-
-            ),
-          )
+          Text((() {
+            if(user!=null){
+              return "${user['userdata']['username']}";
+            }
+            return "---";
+          })())
         ],
       ),
       SizedBox(height: 20.0),
@@ -48,12 +56,12 @@ profDetails(){
             Icons.email,
             color: Colors.black,
           ),
-          Text(
-            " emailHolder@gmail.com",
-            style: TextStyle(
-
-            ),
-          )
+          Text((() {
+            if(user!=null){
+              return "${user['userdata']['email']}";
+            }
+            return "---";
+          })())
         ],
       ),
       SizedBox(height:30.0),
@@ -75,12 +83,13 @@ profDetails(){
                 size: 30.0,
 
               ),
-              Text(
-                "9000.00",
-                style: TextStyle(
-                  fontSize: 30.0
-                ),
-              )
+              Text((() {
+                if(balance!=null){
+                  return "${balance['totalAmount']}.00";
+                }
+                return "0.00";
+              })())
+
             ],
           )
         ],

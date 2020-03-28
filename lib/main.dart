@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:after_layout/after_layout.dart';
 import 'dart:io';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttersacco/AuthLogic.dart';
@@ -13,10 +14,11 @@ import 'loader.dart';
 import 'loader.dart';
 import "profile.dart";
 import "loansPage.dart";
+import 'profileLogic.dart';
 
 
 void main()=>runApp(MaterialApp(
-  home:mainpage(),
+  home:login(),
   theme: new ThemeData(
     primarySwatch: Colors.blue,
   ),
@@ -203,13 +205,15 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
     try {
       Dialogs.showLoadingDialog(context, keyLoader); //invoking login
 //      print("Handlesubmit"+ email);
-      String res = await AuthLogic.signin(username,pass);
-//      print(res);
-      if (res=="success"){
+      var res = await AuthLogic.signin(username,pass);
+      print("dk");
+      print(res);
+      print("dk");
+      if (res!="failed"){
         Navigator.of(context).pop();
         Navigator.of(context).push(
             new MaterialPageRoute(builder:
-                (BuildContext context) => mainpage()));
+                (BuildContext context) => mainpage(logData:res["user"])));
       }else if(res=="failed"){
         Future.delayed(const Duration(milliseconds: 1000), () {
           Navigator.of(context).pop();
@@ -251,181 +255,182 @@ class _signUpState extends State<signUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      resizeToAvoidBottomInset: false,
-
-      body: Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/login.jpeg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(Colors.black87, BlendMode.darken)
-            )
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Divider(
-                    height: 20.0,
-                  ),
-                  Center(
-                    child: Image(
-                      image: AssetImage('assets/kag.jpeg'),
-                      width: 180,
-                      height: 130,
+      body: ListView(
+        children: <Widget>[
+          Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/login.jpeg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.black87, BlendMode.darken)
+              )
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Divider(
+                      height: 20.0,
                     ),
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Theme(
-                      data: ThemeData(
-                        brightness: Brightness.dark,
-                        primarySwatch: Colors.teal,
-                        inputDecorationTheme: InputDecorationTheme(
-                            labelStyle: TextStyle(
-                              color: Colors.teal,
-                              fontSize: 20.0,
-                            )
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(35.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            TextFormField(
-                              controller: formControllers.firstnamecontroller,
-                              decoration: InputDecoration(
-                                labelText: 'Enter firstname',
-                              ),
-                              validator: Validators.required(
-                                  "Firstname is required"),
-                              keyboardType: TextInputType.text,
-
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 18.0),
-                            ),
-                            TextFormField(
-                              controller: formControllers.lastnamecontroller,
-                              decoration: InputDecoration(
-                                labelText: 'Enter lastname',
-                              ),
-                              validator: Validators.required(
-                                  "Lastname is required"),
-                              keyboardType: TextInputType.text,
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 18.0),
-                            ),
-                            TextFormField(
-                              controller: formControllers.emailcontroller,
-                              decoration: InputDecoration(
-                                labelText: 'Enter email',
-                              ),
-                              validator: Validators.email(
-                                  "Invalid email address"),
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 18.0),
-                            ),
-                            TextFormField(
-                              controller: formControllers.usernameconroller,
-                              decoration: InputDecoration(
-                                labelText: 'Enter Username',
-                              ),
-                              validator: Validators.required(
-                                  'Userrname is required'),
-                              keyboardType: TextInputType.text,
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 18.0),
-                            ),
-                            TextFormField(
-                              controller: formControllers.passwordcontroller,
-                              decoration: InputDecoration(
-                                labelText: 'Enter Password',
-                              ),
-                              keyboardType: TextInputType.text,
-                              validator: Validators.minLength(6, "Password has to be more than 6 characters"),
-                              obscureText: true,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 30.0),
-                            ),
-                            MaterialButton(
-                              height: 40.0,
-                              minWidth: 100.0,
-                              color: Colors.teal,
-                              textColor: Colors.white,
-                              child: Text(
-                                  "CREATE ACCOUNT"
-
-                              ),
-                              // ignore: sdk_version_set_literal
-                              onPressed: () =>
-                              {
-
-                                print("Works to here"),
-                              if (_formKey.currentState.validate()) {
-                                _handleSubmit(
-                                    context,
-                                    formControllers.usernameconroller.text,
-                                    formControllers.emailcontroller.text,
-                                    formControllers.passwordcontroller.text,
-                                    formControllers.firstnamecontroller.text,
-                                    formControllers.lastnamecontroller.text
-                                ),
-                              }
-
-                              },
-                              splashColor: Colors.redAccent,
-                            )
-
-                          ],
-                        ),
+                    Center(
+                      child: Image(
+                        image: AssetImage('assets/kag.jpeg'),
+                        width: 180,
+                        height: 130,
                       ),
                     ),
-                    autovalidate: true,
-                  ),
-
-                  Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                    new MaterialPageRoute(builder:
-                                        (BuildContext context) => login()));
-                              },
-                              child: Center(
-                                child: Text(
-                                  "Already have an account? \n Log in",
-                                  style: TextStyle(
-                                      color: Colors.teal
-                                  ),
-                                ),
+                    Form(
+                      key: _formKey,
+                      child: Theme(
+                        data: ThemeData(
+                          brightness: Brightness.dark,
+                          primarySwatch: Colors.teal,
+                          inputDecorationTheme: InputDecorationTheme(
+                              labelStyle: TextStyle(
+                                color: Colors.teal,
+                                fontSize: 20.0,
                               )
                           ),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(35.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              TextFormField(
+                                controller: formControllers.firstnamecontroller,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter firstname',
+                                ),
+                                validator: Validators.required(
+                                    "Firstname is required"),
+                                keyboardType: TextInputType.text,
 
-                        ],
-                      )
-                  )
-                ],
-              ),
-            ],
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 18.0),
+                              ),
+                              TextFormField(
+                                controller: formControllers.lastnamecontroller,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter lastname',
+                                ),
+                                validator: Validators.required(
+                                    "Lastname is required"),
+                                keyboardType: TextInputType.text,
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 18.0),
+                              ),
+                              TextFormField(
+                                controller: formControllers.emailcontroller,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter email',
+                                ),
+                                validator: Validators.email(
+                                    "Invalid email address"),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 18.0),
+                              ),
+                              TextFormField(
+                                controller: formControllers.usernameconroller,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Username',
+                                ),
+                                validator: Validators.required(
+                                    'Userrname is required'),
+                                keyboardType: TextInputType.text,
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 18.0),
+                              ),
+                              TextFormField(
+                                controller: formControllers.passwordcontroller,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Password',
+                                ),
+                                keyboardType: TextInputType.text,
+                                validator: Validators.minLength(6, "Password has to be more than 6 characters"),
+                                obscureText: true,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 30.0),
+                              ),
+                              MaterialButton(
+                                height: 40.0,
+                                minWidth: 100.0,
+                                color: Colors.teal,
+                                textColor: Colors.white,
+                                child: Text(
+                                    "CREATE ACCOUNT"
+
+                                ),
+                                // ignore: sdk_version_set_literal
+                                onPressed: () =>
+                                {
+
+                                  print("Works to here"),
+                                if (_formKey.currentState.validate()) {
+                                  _handleSubmit(
+                                      context,
+                                      formControllers.usernameconroller.text,
+                                      formControllers.emailcontroller.text,
+                                      formControllers.passwordcontroller.text,
+                                      formControllers.firstnamecontroller.text,
+                                      formControllers.lastnamecontroller.text
+                                  ),
+                                }
+
+                                },
+                                splashColor: Colors.redAccent,
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                      autovalidate: true,
+                    ),
+
+                    Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                      new MaterialPageRoute(builder:
+                                          (BuildContext context) => login()));
+                                },
+                                child: Center(
+                                  child: Text(
+                                    "Already have an account? \n Log in",
+                                    style: TextStyle(
+                                        color: Colors.teal
+                                    ),
+                                  ),
+                                )
+                            ),
+
+                          ],
+                        )
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
+      ],
       ),
     );
   }
@@ -435,14 +440,17 @@ class _signUpState extends State<signUp> {
     try {
       Dialogs.showLoadingDialog(context, _keyLoader); //invoking login
       print("Handlesubmit"+ email);
-      String res = await AuthLogic.signup(username,email,pass,first,last);
-      print("Response"+res);
-      if (res=="success"){
+      var res = await AuthLogic.signup(username,email,pass,first,last);
+      print("reeeees\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+      print(res);
+      print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+      if (res['Status']==200){
         Navigator.of(context).pop();
         Navigator.of(context).push(
             new MaterialPageRoute(builder:
-                (BuildContext context) => mainpage()));
-      }else if(res!="success"){
+                (BuildContext context) => mainpage(logData: res['user'],)));
+      }else if(res['Status']==500){
+        print("statuscode no 500");
         Future.delayed(const Duration(milliseconds: 1500), () {
           Navigator.of(context).pop();
           Navigator.of(context).pushReplacement(
@@ -451,8 +459,7 @@ class _signUpState extends State<signUp> {
         });
         print("=======================res coming up===============================");
         print(res);
-        Dialogs.showErrorDialog(context,res);
-
+        Dialogs.showErrorDialog(context,res['user']['username'][0]);
         print("===============================================================================");
         print(res);
       }
@@ -462,12 +469,41 @@ class _signUpState extends State<signUp> {
   }
 }
 
-class mainpage extends StatefulWidget {
+class mainpage extends StatefulWidget  {
+  var logData;
+  mainpage({Key key, this.logData}) : super(key: key);
+
   @override
   _mainpageState createState() => _mainpageState();
 }
 
-class _mainpageState extends State<mainpage> {
+class _mainpageState extends State<mainpage> with AfterLayoutMixin<mainpage> {
+  var user,balance;
+
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    // Calling the same function "after layout" to resolve the issue.
+
+    var jsonData=null;
+    var depoFinance=null;
+    var response = await http.post("https://devsacco.herokuapp.com/api/getUserProfileById/",
+        body:{
+          "user":"${widget.logData["id"]}"
+        });
+    var responseBal = await http.post("https://devsacco.herokuapp.com/api/account/",
+        body:{
+          "id":"${widget.logData["id"]}"
+        });
+    jsonData=json.decode(response.body);
+    depoFinance=json.decode(responseBal.body);
+    setState(() {
+      user=jsonData;
+      balance=depoFinance;
+
+    });
+  }
+
   SharedPreferences sharedpreferences;
   checkLoginStatus() async {
     sharedpreferences = await SharedPreferences.getInstance();
@@ -536,13 +572,15 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title:Text("Home",
-          style: TextStyle(
-            fontSize: 25.0
-          ),
-        )
+        title:Text((() {
+          if(user!=null){
+            return "${user['userdata']['username']}";
+          }
+          return "---";
+        })())
       ),
       body:StaggeredGridView.count(
           crossAxisCount: 2,
@@ -550,11 +588,11 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
           mainAxisSpacing: 12.0,
           padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 8.0),
           children: <Widget>[
-            Profile(),
-            myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage()),
-            myTiles(Icons.account_balance,"Deposit",Colors.green,signUp()),
-            myTiles(Icons.account_balance,"Loan Report",Colors.blue,signUp()),
-            myTiles(Icons.account_balance,"Loan Report",Colors.orange,signUp()),
+            Profile(user,balance),
+            myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage(userData:widget.logData)),
+            myTiles(Icons.input,"Deposit",Colors.green,signUp()),
+            myTiles(Icons.archive,"Withdraw",Colors.blue,signUp()),
+            myTiles(Icons.receipt,"Reports",Colors.orange,signUp()),
 
           ],
         staggeredTiles: [
@@ -569,5 +607,7 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
       ),
     );
   }
+
+
 }
 
