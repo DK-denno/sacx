@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import "package:flutter/material.dart";
+import 'package:http/http.dart' as http;
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttersacco/loader.dart';
 import 'package:fluttersacco/loansLogic.dart';
@@ -14,7 +18,7 @@ class LoansPage extends StatefulWidget {
   _LoansPageState createState() => _LoansPageState();
 }
 
-Material loansPage(){
+Material loansPage(loan,balance){
   return Material(
     color: Colors.white,
     elevation: 40.0,
@@ -50,12 +54,12 @@ Material loansPage(){
                       Icons.account_balance_wallet,
                       size: 20.0,
                     ),
-                    Text(
-                      "9000.00",
-                      style: TextStyle(
-                          fontSize: 20.0
-                      ),
-                    )
+                    Text((() {
+                      if(balance!=null){
+                        return "${balance['totalAmount']*3}.00";
+                      }
+                      return "---";
+                    })())
                   ] ,
                 )
               ],
@@ -81,12 +85,12 @@ Material loansPage(){
                       Icons.account_balance_wallet,
                       size: 20.0,
                     ),
-                    Text(
-                      "9000.00",
-                      style: TextStyle(
-                          fontSize: 20.0
-                      ),
-                    ),
+                    Text((() {
+                      if(loan!=null){
+                        return "${loan['totalAmount']}.00";
+                      }
+                      return "---";
+                    })())
 
                   ] ,
                 ),
@@ -103,7 +107,33 @@ Material loansPage(){
       );
 }
 
-class _LoansPageState extends State<LoansPage> {
+class _LoansPageState extends State<LoansPage> with  AfterLayoutMixin<LoansPage>{
+  var loan,balance;
+
+
+  @override
+  void afterFirstLayout(BuildContext context) async {
+    // Calling the same function "after layout" to resolve the issue.
+
+    var jsonData=null;
+    var depoFinance=null;
+    var Loanresponse = await http.post("https://devsacco.herokuapp.com/api/getuserLoanAccount/",
+        body:{
+          "id":"${widget.userData["id"]}"
+        });
+    var responseBal = await http.post("https://devsacco.herokuapp.com/api/account/",
+        body:{
+          "id":"${widget.userData["id"]}"
+        });
+    jsonData=json.decode(Loanresponse.body);
+    depoFinance=json.decode(responseBal.body);
+    setState(() {
+      loan=jsonData;
+      balance=depoFinance;
+
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -116,7 +146,7 @@ class _LoansPageState extends State<LoansPage> {
 
         Column(
           children: <Widget>[
-             loansPage(),
+             loansPage(loan,balance),
             Form(
               key: _formKey,
               child: Theme(
@@ -180,7 +210,7 @@ class _LoansPageState extends State<LoansPage> {
                           labelText: 'Tertiary Guaranter (optional)',
                         ),
                         keyboardType: TextInputType.text,
-                        validator: Validators.required("Amount is required"),
+
 
                       ),
                       Padding(
@@ -203,6 +233,7 @@ class _LoansPageState extends State<LoansPage> {
                           if (_formKey.currentState.validate()) {
                             _handleSubmit(
                                 context,
+                                widget.userData["id"],
                                 formControllers.amount.text,
                                 formControllers.guaranter1.text,
                                 formControllers.guaranter2.text,
@@ -227,20 +258,21 @@ class _LoansPageState extends State<LoansPage> {
       ),
     );
   }
-  static Future<void> _handleSubmit(BuildContext context,amount,guaranter1,guaranter2,guaranter3) async {
-
+  static Future<void> _handleSubmit(BuildContext context,user,amount,guaranter1,guaranter2,guaranter3) async {
+    int amounInt=int.parse(amount);
+//  print(user.runtimeType);
     final GlobalKey<State> _keyLoader = new GlobalKey<State>();
     try {
-      Dialogs.showLoadingDialog(context, _keyLoader); //invoking login
-      print("Handlesubmit"+ amount);
-      String res = await LoansLogic.borrowLoan(amount,guaranter1,guaranter2,guaranter3);
-      print("Response"+res);
-      if (res=="success"){
+      Dialogs.showLoadingDialog(context, _keyLoader);
+      var res = await LoansLogic.borrowLoan(user,amounInt,guaranter1,guaranter2,guaranter3);
+      print(res);
+      if (res["message"]=="success"){
         Navigator.of(context).pop();
-        Navigator.of(context).push(
-            new MaterialPageRoute(builder:
-                (BuildContext context) => mainpage()));
-      }else if(res!="success"){
+        Dialogs.showSuccessDialog(context,"Your request of a loan ksh ${amount}/= with guaranters ${guaranter1} ${guaranter2} ${guaranter3} has been successfully placed in queue.Pending Approval   ");
+//        Future.delayed(Duration(seconds: 8), () {
+//          Navigator.of(context).pop(true);
+//        });
+      }else if(res["status"]==500){
         Future.delayed(const Duration(milliseconds: 1500), () {
           Navigator.of(context).pop();
           Navigator.of(context).pushReplacement(

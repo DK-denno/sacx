@@ -203,9 +203,9 @@ class _loginState extends State<login> with SingleTickerProviderStateMixin {
   static Future<void> handleLoginSubmit(BuildContext context,username,pass) async {
     final GlobalKey<State> keyLoader = new GlobalKey<State>();
     try {
-      Dialogs.showLoadingDialog(context, keyLoader); //invoking login
+      Dialogs.showLoadingDialog(context, keyLoader);
+      var res = await AuthLogic.signin(username,pass); //invoking login
 //      print("Handlesubmit"+ email);
-      var res = await AuthLogic.signin(username,pass);
       print("dk");
       print(res);
       print("dk");
@@ -323,7 +323,6 @@ class _signUpState extends State<signUp> {
                                     "Lastname is required"),
                                 keyboardType: TextInputType.text,
                               ),
-
                               Padding(
                                 padding: const EdgeInsets.only(top: 18.0),
                               ),
@@ -439,8 +438,8 @@ class _signUpState extends State<signUp> {
     final GlobalKey<State> _keyLoader = new GlobalKey<State>();
     try {
       Dialogs.showLoadingDialog(context, _keyLoader); //invoking login
-      print("Handlesubmit"+ email);
       var res = await AuthLogic.signup(username,email,pass,first,last);
+      print("Handlesubmit"+ email);
       print("reeeees\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
       print(res);
       print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -500,7 +499,6 @@ class _mainpageState extends State<mainpage> with AfterLayoutMixin<mainpage> {
     setState(() {
       user=jsonData;
       balance=depoFinance;
-
     });
   }
 
@@ -508,7 +506,7 @@ class _mainpageState extends State<mainpage> with AfterLayoutMixin<mainpage> {
   checkLoginStatus() async {
     sharedpreferences = await SharedPreferences.getInstance();
     if(sharedpreferences.getString("username")==null){
-      //Royte back to this page
+      //Rote back to this page
     }
 
   }
@@ -572,7 +570,6 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title:Text((() {

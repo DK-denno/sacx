@@ -9,18 +9,24 @@ import 'dart:convert';
 
 class LoansLogic {
 
-  static Future<String> borrowLoan(int ammount, String guaranter1,String guaranter2,String guaranter3,) async {
+  static Future borrowLoan(int user,int amount, String guaranter1,String guaranter2,String guaranter3) async {
+    print(amount.runtimeType);
+
+
     var jsonData = null;
     var response = await http.post("https://devsacco.herokuapp.com/api/updateLoan/",
     body: {
-      "user":3,
-      "totalAmount":ammount,
+      "user":"${user}",
+      "totalAmount":"${amount}",
       "guaranter1":guaranter1,
       "guaranter2":guaranter3,
       "guaranter3":guaranter3,
-      "transactionType":"borrow"
-    });
-    print(response);
+      "transactionType":"borrow",
+      "description":"loan",
+        });
+    jsonData=json.decode(response.body);
+    print(jsonData);
+    return jsonData;
 
   }
   static Future<String> signup(String username,String email,String password,String first_name,String last_name) async {
