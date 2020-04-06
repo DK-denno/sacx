@@ -3,6 +3,8 @@ import 'package:after_layout/after_layout.dart';
 import 'dart:io';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttersacco/AuthLogic.dart';
+import 'package:fluttersacco/deposits.dart';
+import 'package:fluttersacco/reportsUi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ import 'profileLogic.dart';
 
 
 void main()=>runApp(MaterialApp(
-  home:login(),
+  home:reports(),
   theme: new ThemeData(
     primarySwatch: Colors.blue,
   ),
@@ -587,17 +589,17 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
           children: <Widget>[
             Profile(user,balance),
             myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage(userData:widget.logData)),
-            myTiles(Icons.input,"Deposit",Colors.green,signUp()),
+            myTiles(Icons.input,"Deposit",Colors.green,depositsDialog(userData: widget.logData)),
             myTiles(Icons.archive,"Withdraw",Colors.blue,signUp()),
-            myTiles(Icons.receipt,"Reports",Colors.orange,signUp()),
+            myTiles(Icons.receipt,"Reports",Colors.orange,reports()),
 
           ],
         staggeredTiles: [
-          StaggeredTile.extent(2, 350.0),
-          StaggeredTile.extent(1, 130.0),
-          StaggeredTile.extent(1, 130.0),
-          StaggeredTile.extent(1, 130.0),
-          StaggeredTile.extent(1, 130.0),
+          StaggeredTile.extent(2, 300.0),
+          StaggeredTile.extent(1, 150.0),
+          StaggeredTile.extent(1, 150.0),
+          StaggeredTile.extent(1, 150.0),
+          StaggeredTile.extent(1, 150.0),
 
 
         ],
