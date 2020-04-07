@@ -17,6 +17,7 @@ import 'loader.dart';
 import "profile.dart";
 import "loansPage.dart";
 import 'profileLogic.dart';
+import "testList.dart";
 
 
 void main()=>runApp(MaterialApp(
