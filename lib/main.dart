@@ -21,7 +21,7 @@ import "testList.dart";
 
 
 void main()=>runApp(MaterialApp(
-  home:reports(),
+  home:login(),
   theme: new ThemeData(
     primarySwatch: Colors.blue,
   ),
@@ -479,14 +479,16 @@ class mainpage extends StatefulWidget  {
   _mainpageState createState() => _mainpageState();
 }
 
-class _mainpageState extends State<mainpage> with AfterLayoutMixin<mainpage> {
+class _mainpageState extends State<mainpage> {
   var user,balance;
-
+  bool _isLoading=true;
 
   @override
-  void afterFirstLayout(BuildContext context) async {
-    // Calling the same function "after layout" to resolve the issue.
-
+  void initState(){
+    super.initState();
+    getData();
+  }
+  getData()async{
     var jsonData=null;
     var depoFinance=null;
     var response = await http.post("https://devsacco.herokuapp.com/api/getUserProfileById/",
@@ -502,8 +504,11 @@ class _mainpageState extends State<mainpage> with AfterLayoutMixin<mainpage> {
     setState(() {
       user=jsonData;
       balance=depoFinance;
+      _isLoading=false;
     });
+    print(user);
   }
+
 
   SharedPreferences sharedpreferences;
   checkLoginStatus() async {
@@ -573,16 +578,27 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:Text((() {
-          if(user!=null){
-            return "${user['userdata']['username']}";
-          }
-          return "---";
-        })())
-      ),
-      body:StaggeredGridView.count(
+    if(_isLoading==true){
+      return Scaffold(
+        appBar: AppBar(
+          title:Text("Transaction reports"),
+          backgroundColor: Colors.white,
+        ),
+        body: Center(
+          child: new CircularProgressIndicator(),
+        ),
+      );
+    }else{
+      return Scaffold(
+        appBar: AppBar(
+            title:Text((() {
+              if(user!=null){
+                return "${user['userdata']['username']}";
+              }
+              return "---";
+            })())
+        ),
+        body:StaggeredGridView.count(
           crossAxisCount: 2,
           crossAxisSpacing: 12.0,
           mainAxisSpacing: 12.0,
@@ -592,20 +608,21 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
             myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage(userData:widget.logData)),
             myTiles(Icons.input,"Deposit",Colors.green,depositsDialog(userData: widget.logData)),
             myTiles(Icons.archive,"Withdraw",Colors.blue,signUp()),
-            myTiles(Icons.receipt,"Reports",Colors.orange,reports()),
+            myTiles(Icons.receipt,"Reports",Colors.orange,reports(logData: user)),
 
           ],
-        staggeredTiles: [
-          StaggeredTile.extent(2, 300.0),
-          StaggeredTile.extent(1, 150.0),
-          StaggeredTile.extent(1, 150.0),
-          StaggeredTile.extent(1, 150.0),
-          StaggeredTile.extent(1, 150.0),
+          staggeredTiles: [
+            StaggeredTile.extent(2, 300.0),
+            StaggeredTile.extent(1, 150.0),
+            StaggeredTile.extent(1, 150.0),
+            StaggeredTile.extent(1, 150.0),
+            StaggeredTile.extent(1, 150.0),
 
 
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 
 
