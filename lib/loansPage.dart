@@ -107,14 +107,17 @@ Material loansPage(loan,balance){
       );
 }
 
-class _LoansPageState extends State<LoansPage> with  AfterLayoutMixin<LoansPage>{
+class _LoansPageState extends State<LoansPage>{
   var loan,balance;
-
+  bool _isLoading=true;
 
   @override
-  void afterFirstLayout(BuildContext context) async {
-    // Calling the same function "after layout" to resolve the issue.
+  void initState(){
+    super.initState();
+    getData();
+  }
 
+  getData()async{
     var jsonData=null;
     var depoFinance=null;
     var Loanresponse = await http.post("https://devsacco.herokuapp.com/api/getuserLoanAccount/",
@@ -130,133 +133,147 @@ class _LoansPageState extends State<LoansPage> with  AfterLayoutMixin<LoansPage>
     setState(() {
       loan=jsonData;
       balance=depoFinance;
-
+      _isLoading=false;
     });
   }
+
 
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Loan"),
-      ),
-      body: ListView(
-        children: <Widget>[
+    if(_isLoading==true){
+      return Scaffold(
+        appBar: AppBar(
+          title:Text("Transaction reports"),
+          backgroundColor: Colors.white,
+        ),
+        body: Center(
+          child: new CircularProgressIndicator(),
+        ),
+      );
 
-        Column(
+    }else{
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Loan"),
+        ),
+        body: ListView(
           children: <Widget>[
-             loansPage(loan,balance),
-            Form(
-              key: _formKey,
-              child: Theme(
-                data: ThemeData(
-                  brightness: Brightness.dark,
-                  primarySwatch: Colors.teal,
-                  inputDecorationTheme: InputDecorationTheme(
-                    border: InputBorder.none,
-                    filled: true,
-                    fillColor: Colors.black,
-                      labelStyle: TextStyle(
-                        fontSize: 20.0,
+
+            Column(
+              children: <Widget>[
+                loansPage(loan,balance),
+                Form(
+                  key: _formKey,
+                  child: Theme(
+                    data: ThemeData(
+                      brightness: Brightness.dark,
+                      primarySwatch: Colors.teal,
+                      inputDecorationTheme: InputDecorationTheme(
+                        border: InputBorder.none,
+                        filled: true,
+                        fillColor: Colors.black,
+                        labelStyle: TextStyle(
+                          fontSize: 20.0,
+                        ),
                       ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(35.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18.0),
+                          ),
+                          TextFormField(
+                            controller: formControllers.amount,
+                            decoration: InputDecoration(
+                              labelText: 'Enter Amount',
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: Validators.required("Amount is required"),
+                            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                          ),
+                          TextFormField(
+                            controller: formControllers.guaranter1,
+                            decoration: InputDecoration(
+                              labelText: 'Primary Guaranter (optional)',
+                            ),
+                            keyboardType: TextInputType.text,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                          ),
+                          TextFormField(
+                            controller: formControllers.guaranter2,
+                            decoration: InputDecoration(
+                              labelText: 'Secondary Guaranter (optional)',
+                            ),
+                            keyboardType: TextInputType.text,
+
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                          ),
+                          TextFormField(
+                            controller: formControllers.guaranter3,
+                            decoration: InputDecoration(
+                              labelText: 'Tertiary Guaranter (optional)',
+                            ),
+                            keyboardType: TextInputType.text,
+
+
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                          ),
+                          MaterialButton(
+                            height: 40.0,
+                            minWidth: 100.0,
+                            color: Colors.teal,
+                            textColor: Colors.white,
+                            child: Text(
+                                "BORROW LOAN"
+
+                            ),
+                            // ignore: sdk_version_set_literal
+                            onPressed: () =>
+                            {
+
+                              print("Works to here"),
+                              if (_formKey.currentState.validate()) {
+                                _handleSubmit(
+                                    context,
+                                    widget.userData["id"],
+                                    formControllers.amount.text,
+                                    formControllers.guaranter1.text,
+                                    formControllers.guaranter2.text,
+                                    formControllers.guaranter3.text),
+                                print("Data sent to server"),
+                              }
+
+                            },
+                            splashColor: Colors.redAccent,
+                          )
+
+                        ],
+                      ),
+                    ),
                   ),
+                  autovalidate: true,
                 ),
-                child: Container(
-                  padding: const EdgeInsets.all(35.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 18.0),
-                      ),
-                      TextFormField(
-                        controller: formControllers.amount,
-                        decoration: InputDecoration(
-                          labelText: 'Enter Amount',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: Validators.required("Amount is required"),
-                        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-                      ),
 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                      ),
-                       TextFormField(
-                        controller: formControllers.guaranter1,
-                        decoration: InputDecoration(
-                          labelText: 'Primary Guaranter (optional)',
-                        ),
-                        keyboardType: TextInputType.text,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                      ),
-                      TextFormField(
-                        controller: formControllers.guaranter2,
-                        decoration: InputDecoration(
-                          labelText: 'Secondary Guaranter (optional)',
-                        ),
-                        keyboardType: TextInputType.text,
-
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                      ),
-                      TextFormField(
-                        controller: formControllers.guaranter3,
-                        decoration: InputDecoration(
-                          labelText: 'Tertiary Guaranter (optional)',
-                        ),
-                        keyboardType: TextInputType.text,
-
-
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
-                      ),
-                      MaterialButton(
-                        height: 40.0,
-                        minWidth: 100.0,
-                        color: Colors.teal,
-                        textColor: Colors.white,
-                        child: Text(
-                            "BORROW LOAN"
-
-                        ),
-                        // ignore: sdk_version_set_literal
-                        onPressed: () =>
-                        {
-
-                          print("Works to here"),
-                          if (_formKey.currentState.validate()) {
-                            _handleSubmit(
-                                context,
-                                widget.userData["id"],
-                                formControllers.amount.text,
-                                formControllers.guaranter1.text,
-                                formControllers.guaranter2.text,
-                                formControllers.guaranter3.text),
-                            print("Data sent to server"),
-                          }
-
-                        },
-                        splashColor: Colors.redAccent,
-                      )
-
-                    ],
-                  ),
-                ),
-              ),
-              autovalidate: true,
+              ],
             ),
-
           ],
         ),
-    ],
-      ),
-    );
+      );
+    }
   }
   static Future<void> _handleSubmit(BuildContext context,user,amount,guaranter1,guaranter2,guaranter3) async {
     int amounInt=int.parse(amount);
