@@ -191,7 +191,7 @@ class Dialogs {
                     Center(
                       child: Column(children: [
                         Loader(),
-                        SizedBox(height: 10,),
+                        SizedBox(height: 10),
                         Text("Please Wait....",style: TextStyle(color: Colors.blueAccent),)
                       ]),
                     )
@@ -211,6 +211,42 @@ class Dialogs {
 
           elevation:1.0,
           title: new Text("Error"),
+          content: new Text(message),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  static void showSuccessDialog(context,message) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 8), () {
+          Navigator.of(context).pop(true);
+        });
+        // return object of type Dialog
+        return AlertDialog(
+
+          elevation:1.0,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+                  Icon(
+                    Icons.turned_in,
+                    size: 30.0,
+                  ),
+              Text("Success"),
+            ],
+          ),
           content: new Text(message),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
