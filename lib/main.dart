@@ -604,7 +604,7 @@ Material myTiles(IconData icon,String title,Color color,StatefulWidget tile){
           mainAxisSpacing: 12.0,
           padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 8.0),
           children: <Widget>[
-            Profile(user,balance),
+            Profile(user,balance,context),
             myTiles(Icons.account_balance,"Loan",Colors.red,LoansPage(userData:widget.logData)),
             myTiles(Icons.input,"Deposit",Colors.green,depositsDialog(userData: widget.logData)),
             myTiles(Icons.archive,"Withdraw",Colors.blue,signUp()),

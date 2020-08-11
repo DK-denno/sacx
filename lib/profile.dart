@@ -1,6 +1,11 @@
-import "package:flutter/material.dart";
+import 'dart:io';
 
-Material Profile(user,balance){
+import "package:flutter/material.dart";
+import 'package:fluttersacco/loader.dart';
+import "imagePicker.dart";
+
+
+Material Profile(user,balance,context){
   return Material(
     color: Colors.white,
     elevation: 40.0,
@@ -9,20 +14,27 @@ Material Profile(user,balance){
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Center(
-              child: CircleAvatar(
-                backgroundImage: NetworkImage((() {
-                  if(user!=null){
-                    if(user['profile']['idPhoto']!=null){
-                      return "${user['profile']['idPhoto']}";
+            GestureDetector(
+              onTap: () {
+                Dialogs.showPicker(context);
+                print("IMAGE IS CLICKED");
+              },
+              child:Center(
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage((() {
+                    if(user!=null){
+                      if(user['profile']['idPhoto']!=null){
+                        return "${user['profile']['idPhoto']}";
+                      }
+                      return "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEyza1-CKEJK6Hyq50yE8oOpyba5HbJaCqMioudHzaxVh-a9Is";
                     }
                     return "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEyza1-CKEJK6Hyq50yE8oOpyba5HbJaCqMioudHzaxVh-a9Is";
-                  }
-                  return "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQEyza1-CKEJK6Hyq50yE8oOpyba5HbJaCqMioudHzaxVh-a9Is";
-                })()),
-                radius: 50.0,
+                  })()),
+                  radius: 50.0,
+                ),
               ),
             ),
+
             Divider(height: 30.0),
             profDetails(user,balance),
           ],
@@ -97,3 +109,4 @@ profDetails(user,balance){
     ],
   );
 }
+
